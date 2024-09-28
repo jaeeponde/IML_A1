@@ -1,0 +1,3 @@
+Training MSE: 0.3989
+Training RMSE: 0.6316
+Training R²: 0.9601
