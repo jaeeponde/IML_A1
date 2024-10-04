@@ -96,7 +96,7 @@ train_r2 = r_squared(y_train, y_train_pred)
 
 
 # Output training metrics to file
-with open('/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/autopoly_metrics.txt', 'w') as f:
+with open('/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_metrics.txt', 'w') as f:
     f.write(f"Training MSE: {train_mse:.4f}\n")
     f.write(f"Training RMSE: {train_rmse:.4f}\n")
     f.write(f"Training R²: {train_r2:.4f}\n")
@@ -116,4 +116,4 @@ def create_and_overwrite_predictions_csv(actual, predicted, filename):
 
 
 # Call the function to overwrite the CSV file
-create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/autopolypredictions.csv")
+create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_predictions.csv")
