@@ -27,7 +27,7 @@ def polynomial_features(X, degree):
 
 # Step 3: Initialize Weights
 def initialize_weights(n_features):
-    return np.random.randn(n_features)
+    return np.full(n_features, 2)
 
 # Step 4: Hypothesis Function (for predictions)
 def hypothesis(X, weights):
@@ -69,7 +69,7 @@ n_features = X_train_bias.shape[1]
 weights = initialize_weights(n_features)
 
 learning_rate = 0.3
-n_iterations = 1000
+n_iterations = 10000
 
 # Train the model using gradient descent
 trained_weights = gradient_descent(X_train_bias, y_train, weights, learning_rate, n_iterations)
@@ -88,7 +88,7 @@ train_rmse = rmse_loss(y_train, y_train_pred)
 train_r2 = r_squared(y_train, y_train_pred)
 
 # Output training metrics to file
-with open('/Users/jaeeponde/IML_A1/IML_A1/results/train_metrics.txt', 'w') as f:
+with open('/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_metrics.txt', 'w') as f:
     f.write(f"Training MSE: {train_mse:.4f}\n")
     f.write(f"Training RMSE: {train_rmse:.4f}\n")
     f.write(f"Training R²: {train_r2:.4f}\n")
@@ -108,4 +108,4 @@ def create_and_overwrite_predictions_csv(actual, predicted, filename):
 
 
 # Call the function to overwrite the CSV file
-create_and_overwrite_predictions_csv(y_train, y_train_pred, "//Users/jaeeponde/IML_A1/IML_A1/results/train_predictions.csv")
+create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_predictions.csv")
