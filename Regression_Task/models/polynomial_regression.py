@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
-df=pd.read_csv("/Users/jaeeponde/IML_A1/IML_A1/trail_training_data.csv")
+df=pd.read_csv("/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/data/training_data.csv")
 # Shuffle the data and reset the index
 df_shuffled = df.sample(frac=1).reset_index(drop=True)
 

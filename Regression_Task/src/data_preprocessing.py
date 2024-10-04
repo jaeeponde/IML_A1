@@ -61,10 +61,14 @@ df = df[[col for col in df.columns if col != 'FUEL CONSUMPTION'] + ['FUEL CONSUM
 df_normalized = (df - df.min()) / (df.max() - df.min())
 df_normalized['FUEL CONSUMPTION'] = df['FUEL CONSUMPTION'].values
 
-# Output the result to a CSV file
-df_normalized.to_csv('trail_training_data.csv', index=False)
+# Specify the file path where you want to save the CSV
+output_path = "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/data/training_data.csv"  # Replace with your desired path
 
-print("CSV file 'trail_training_data.csv' has been created successfully.")
+# Output the result to the specified CSV file
+df_normalized.to_csv(output_path, index=False)
+
+print(f"CSV file '{output_path}' has been created successfully.")
+
 
 
 
