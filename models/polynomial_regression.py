@@ -1,15 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 import pandas as pd
 
-# Load and shuffle the dataset
-df = pd.read_csv("/Users/jaeeponde/IML_A1/IML_A1/trail_training_data.csv")
+df=pd.read_csv("/Users/jaeeponde/IML_A1/IML_A1/trail_training_data.csv")
+# Shuffle the data and reset the index
 df_shuffled = df.sample(frac=1).reset_index(drop=True)
+
 train_data = df_shuffled
 
 # Extract features and target
 X_train = train_data.drop(columns='FUEL CONSUMPTION').values
 y_train = train_data['FUEL CONSUMPTION'].values
+
 
 # Step 1: Add Bias Term
 def add_bias_term(X):
@@ -30,14 +33,13 @@ def initialize_weights(n_features):
 def hypothesis(X, weights):
     return np.dot(X, weights)
 
-# Step 5: Mean Squared Error (MSE) with Regularization (L2)
-def mse_loss(y_true, y_pred, weights, lambda_):
-    regularization_term = lambda_ * np.sum(weights[1:] ** 2)  # Regularize all weights except the bias term
-    return np.mean((y_true - y_pred) ** 2) + regularization_term
+# Step 5: Mean Squared Error (MSE)
+def mse_loss(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
 
 # Step 6: Root Mean Squared Error (RMSE)
 def rmse_loss(y_true, y_pred):
-    return np.sqrt(np.mean((y_true - y_pred) ** 2))
+    return np.sqrt(mse_loss(y_true, y_pred))
 
 # Step 7: R-squared (R²)
 def r_squared(y_true, y_pred):
@@ -45,30 +47,18 @@ def r_squared(y_true, y_pred):
     ss_residual = np.sum((y_true - y_pred) ** 2)
     return 1 - (ss_residual / ss_total)
 
-# Step 8: Gradient Descent with Regularization and Automatic Convergence
-def gradient_descent(X, y, weights, learning_rate, lambda_, tolerance=1e-6):
+# Step 8: Gradient Descent
+def gradient_descent(X, y, weights, learning_rate, n_iterations):
     m = X.shape[0]
-    prev_loss = float('inf')
-    epoch = 0
-    while True:
+    for i in range(n_iterations):
         y_pred = hypothesis(X, weights)
-        gradients = (1/m) * np.dot(X.T, (y_pred - y)) + lambda_ * np.r_[0, weights[1:]]  # Apply L2 regularization (skip bias term)
+        gradients = (1/m) * np.dot(X.T, (y_pred - y))
         weights = weights - learning_rate * gradients
-
-        # Compute the current loss with regularization
-        loss = mse_loss(y, y_pred, weights, lambda_)
-        if epoch % 100 == 0:
-            print(f"Epoch {epoch}: MSE = {loss:.4f}")
         
-        # Check for convergence
-        if abs(prev_loss - loss) < tolerance:
-            print(f"Converged after {epoch} epochs with a tolerance of {tolerance}")
-            break
-        
-        prev_loss = loss
-        epoch += 1
-
-    return weights, epoch
+        if i % 10000 == 0:
+            loss = mse_loss(y, y_pred)
+            print(f"Iteration {i}: MSE = {loss:.4f}")
+    return weights
 
 # Step 9: Train the Model
 degree = 3  # Degree of the polynomial
@@ -78,18 +68,22 @@ X_train_bias = add_bias_term(X_train_poly)
 n_features = X_train_bias.shape[1]
 weights = initialize_weights(n_features)
 
-learning_rate = 0.3
-lambda_ = 0 # Regularization strength
-tolerance = 1e-6  # Convergence threshold
+learning_rate = 0.39
+n_iterations = 50000
 
-# Train the model using gradient descent with regularization and convergence check
-trained_weights, n_epochs = gradient_descent(X_train_bias, y_train, weights, learning_rate, lambda_, tolerance)
+# Train the model using gradient descent
+trained_weights = gradient_descent(X_train_bias, y_train, weights, learning_rate, n_iterations)
 
 # Step 10: Predictions on Training Data
 y_train_pred = hypothesis(X_train_bias, trained_weights)
 
-# Step 11: Calculate Metrics for Training Data
-train_mse = mse_loss(y_train, y_train_pred, trained_weights, lambda_)
+
+#y_test_pred = hypothesis(X_test_bias, trained_weights)
+
+# Step 12: Calculate Metrics for Training Data
+
+# Step 12: Calculate Metrics for Training Data
+train_mse = mse_loss(y_train, y_train_pred)
 train_rmse = rmse_loss(y_train, y_train_pred)
 train_r2 = r_squared(y_train, y_train_pred)
 
@@ -98,16 +92,20 @@ with open('/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_metrics.
     f.write(f"Training MSE: {train_mse:.4f}\n")
     f.write(f"Training RMSE: {train_rmse:.4f}\n")
     f.write(f"Training R²: {train_r2:.4f}\n")
-    f.write(f"Total Epochs: {n_epochs}\n")
 
-# Function to save predictions to a CSV file
+
 def create_and_overwrite_predictions_csv(actual, predicted, filename):
+    # Create a new DataFrame with 'Actual' and 'Predicted' columns
     new_df = pd.DataFrame({
         'Actual': actual,
         'Predicted': predicted
     })
+    
+    # Overwrite the existing CSV file with the new DataFrame
     new_df.to_csv(filename, index=False)
     print(f"New predictions saved and file overwritten: {filename}")
 
-# Save predictions
-create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_predictions_auto_poly.csv")
+
+
+# Call the function to overwrite the CSV file
+create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_predictions.csv")
