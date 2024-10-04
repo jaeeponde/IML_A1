@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
-df=pd.read_csv("/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/data/training_data.csv")
+df=pd.read_csv("/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/data/training_data.csv")
 # Shuffle the data and reset the index
 df_shuffled = df.sample(frac=1).reset_index(drop=True)
 
@@ -88,10 +88,11 @@ train_rmse = rmse_loss(y_train, y_train_pred)
 train_r2 = r_squared(y_train, y_train_pred)
 
 # Output training metrics to file
-with open('/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_metrics.txt', 'w') as f:
-    f.write(f"Training MSE: {train_mse:.4f}\n")
-    f.write(f"Training RMSE: {train_rmse:.4f}\n")
-    f.write(f"Training R²: {train_r2:.4f}\n")
+with open('/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/results/train_metrics.txt', 'w') as f:
+    f.write(f"Regression Metrics\n")
+    f.write(f"Mean Squared Error (MSE): {train_mse:.4f}\n")
+    f.write(f"Root Mean Squared Error (RMSE): {train_rmse:.4f}\n")
+    f.write(f"R-squared (R²) Score {train_r2:.4f}\n")
 
 
 def create_and_overwrite_predictions_csv(actual, predicted, filename):
@@ -108,4 +109,21 @@ def create_and_overwrite_predictions_csv(actual, predicted, filename):
 
 
 # Call the function to overwrite the CSV file
-create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_predictions.csv")
+create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/results/train_predictions.csv")
+
+import pickle
+
+# Create a dictionary to store the trained model (weights, degree of polynomial, etc.)
+model_info = {
+    'weights': trained_weights,
+    'degree': degree  # Save the degree of the polynomial transformation
+}
+
+# Path to save the model
+model_path = '/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/models/regression_model_final.pkl'
+
+# Save the model to a pickle file
+with open(model_path, 'wb') as file:
+    pickle.dump(model_info, file)
+
+print(f"Model saved to {model_path}")

@@ -1,76 +1,74 @@
 import pandas as pd
 
 # Load the dataset
-df = pd.read_csv('/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/data/fuel_train - fuel_train.csv')
+df = pd.read_csv('/Users/jaeeponde/Jaee_Ponde_A1/synthetic_vehicle_data.csv')
 
-# Drop the 'Year' column
-df = df.drop(columns=['Year'])
+# Drop the 'Year' column (if it exists)
+if 'Year' in df.columns:
+    df = df.drop(columns=['Year'])
 
+# One-hot encode the 'FUEL' column if it exists
+if 'FUEL' in df.columns:
+    one_hot_encoded_df = pd.get_dummies(df['FUEL'], prefix='FUEL')
+    df = pd.concat([df, one_hot_encoded_df], axis=1)
+    df = df.drop(columns=[col for col in ['FUEL', 'FUEL_D', 'FUEL_E', 'FUEL_N'] if col in df.columns])
 
-# One-hot encode the 'FUEL' column
-one_hot_encoded_df = pd.get_dummies(df['FUEL'], prefix='FUEL')
-df = pd.concat([df, one_hot_encoded_df], axis=1)
-df = df.drop(columns=['FUEL', 'FUEL_D', 'FUEL_E', 'FUEL_N'])
+# One-hot encode the 'TRANSMISSION' column if it exists
+if 'TRANSMISSION' in df.columns:
+    one_hot_encoded_df = pd.get_dummies(df['TRANSMISSION'], prefix='TRANSMISSION')
+    df = pd.concat([df, one_hot_encoded_df], axis=1)
+    df = df.drop(columns=[col for col in ['TRANSMISSION', 'TRANSMISSION_M6', 'TRANSMISSION_AS4', 'TRANSMISSION_A3', 'TRANSMISSION_AS5'] if col in df.columns])
 
-# One-hot encode the 'TRANSMISSION' column
-one_hot_encoded_df = pd.get_dummies(df['TRANSMISSION'], prefix='TRANSMISSION')
-df = pd.concat([df, one_hot_encoded_df], axis=1)
-df = df.drop(columns=['TRANSMISSION', 'TRANSMISSION_M6', 'TRANSMISSION_AS4', 'TRANSMISSION_A3', 'TRANSMISSION_AS5'])
+# Drop the 'MODEL' column (if it exists)
+if 'MODEL' in df.columns:
+    df = df.drop(columns=['MODEL'])
 
-# Drop the 'MODEL' column
-df = df.drop(columns=['MODEL'])
+# Map the 'VEHICLE CLASS' column if it exists
+vehicle_class_mapping = {
+    'COMPACT': 3.08, 'FULL-SIZE': 3.61, 'MID-SIZE': 3.42, 'MINICOMPACT': 3.67,
+    'MINIVAN': 3.97, 'PICKUP TRUCK - SMALL': 3.53, 'PICKUP TRUCK - STANDARD': 4.34,
+    'STATION WAGON - MID-SIZE': 3.31, 'STATION WAGON - SMALL': 2.99, 'SUBCOMPACT': 3.02,
+    'SUV': 4.00, 'TWO-SEATER': 4.23, 'VAN - CARGO': 4.50, 'VAN - PASSENGER': 4.83
+}
 
-# Calculate mean fuel consumption per vehicle class
-mean_fuel_consumption = df.groupby('VEHICLE CLASS')['FUEL CONSUMPTION'].mean().reset_index()
-mean_fuel_consumption.columns = ['VEHICLE_TYPE', 'MEAN_FUEL_CONSUMPTION']
-mean_fuel_consumption['MEAN_FUEL_CONSUMPTION'] = (mean_fuel_consumption['MEAN_FUEL_CONSUMPTION'] / 4).round(2)
+def map_vehicle_class(vehicle_class):
+    return vehicle_class_mapping.get(vehicle_class, None)
 
-# Create a map of fuel consumption
-fuel_consumption_map = dict(zip(mean_fuel_consumption['VEHICLE_TYPE'], mean_fuel_consumption['MEAN_FUEL_CONSUMPTION']))
-df['VEHICLE CLASS'] = df['VEHICLE CLASS'].map(fuel_consumption_map)
+if 'VEHICLE CLASS' in df.columns:
+    df['VEHICLE CLASS'] = df['VEHICLE CLASS'].apply(map_vehicle_class)
 
-# Calculate mean fuel consumption per make
-mean_make = df.groupby('MAKE')['FUEL CONSUMPTION'].mean().reset_index()
-mean_make.columns = ['make', 'MEAN_FUEL_CONSUMPTION']
-mean_make = mean_make.sort_values(by='MEAN_FUEL_CONSUMPTION')
+# Map the 'MAKE' column if it exists
+vehicle_brand_mapping = {
+    'SUZUKI': 2.75, 'SATURN': 2.75, 'HONDA': 2.75, 'VOLKSWAGEN': 3.00, 'DAEWOO': 3.00,
+    'HYUNDAI': 3.00, 'SUBARU': 3.00, 'KIA': 3.00, 'PONTIAC': 3.25, 'ACURA': 3.25,
+    'TOYOTA': 3.25, 'OLDSMOBILE': 3.25, 'INFINITI': 3.50, 'MAZDA': 3.50, 'VOLVO': 3.50,
+    'SAAB': 3.50, 'CHRYSLER': 3.50, 'BUICK': 3.50, 'MERCEDES-BENZ': 3.50, 'AUDI': 3.50,
+    'BMW': 3.75, 'LEXUS': 3.75, 'NISSAN': 3.75, 'CADILLAC': 3.75, 'PLYMOUTH': 3.75,
+    'CHEVROLET': 3.75, 'PORSCHE': 4.00, 'ISUZU': 4.00, 'JAGUAR': 4.00, 'FORD': 4.00,
+    'LINCOLN': 4.00, 'JEEP': 4.00, 'GMC': 4.50, 'DODGE': 4.75, 'LAND ROVER': 5.00,
+    'FERRARI': 6.25
+}
 
-# Define bins and labels for 'MEAN_FUEL_CONSUMPTION'
-bins = [10.5, 11.5, 12.5, 13.5, 14.5, 15.5, 16.5, 17.5, 18.5, 19.5, 20.5, 30]
-labels = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25]
-mean_make['Binned_MEAN_FUEL_CONSUMPTION'] = pd.cut(mean_make['MEAN_FUEL_CONSUMPTION'], bins=bins, labels=labels, right=False)
+def map_vehicle_brand(brand):
+    return vehicle_brand_mapping.get(brand, None)
 
-# Drop unnecessary columns and finalize the 'Binned_MEAN_FUEL_CONSUMPTION'
-mean_make = mean_make.drop(columns=['MEAN_FUEL_CONSUMPTION'])
-mean_make['Binned_MEAN_FUEL_CONSUMPTION'] = (mean_make['Binned_MEAN_FUEL_CONSUMPTION'].astype(int) / 4).round(2)
+if 'MAKE' in df.columns:
+    df['MAKE'] = df['MAKE'].apply(map_vehicle_brand)
 
-# Map the binned fuel consumption to the dataframe
-consumption_map = dict(zip(mean_make['make'], mean_make['Binned_MEAN_FUEL_CONSUMPTION']))
-df['MAKE'] = df['MAKE'].map(consumption_map)
+# Convert certain columns to integers only if they exist
+for col in ['FUEL_X', 'FUEL_Z', 'TRANSMISSION_A4', 'TRANSMISSION_A5', 'TRANSMISSION_M5']:
+    if col in df.columns:
+        df[col] = df[col].astype(int)
 
-# Convert certain columns to integers
-df['FUEL_X'] = df['FUEL_X'].astype(int)
-df['FUEL_Z'] = df['FUEL_Z'].astype(int)
-df['TRANSMISSION_A4'] = df['TRANSMISSION_A4'].astype(int)
-df['TRANSMISSION_A5'] = df['TRANSMISSION_A5'].astype(int)
-df['TRANSMISSION_M5'] = df['TRANSMISSION_M5'].astype(int)
-
-# Reorder the columns to have 'FUEL CONSUMPTION' as the last column
-df = df[[col for col in df.columns if col != 'FUEL CONSUMPTION'] + ['FUEL CONSUMPTION']]
-
-# Normalize the dataframe
+# Normalize the dataframe (excluding 'FUEL CONSUMPTION' if it exists)
 df_normalized = (df - df.min()) / (df.max() - df.min())
-df_normalized['FUEL CONSUMPTION'] = df['FUEL CONSUMPTION'].values
+if 'FUEL CONSUMPTION' in df.columns:
+    df_normalized = df.drop(columns=['FUEL CONSUMPTION'])
 
 # Specify the file path where you want to save the CSV
-output_path = "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/data/training_data.csv"  # Replace with your desired path
+output_path = "/Users/jaeeponde/Jaee_Ponde_A1/synthetic_data_new.csv"  # Replace with your desired path
 
 # Output the result to the specified CSV file
 df_normalized.to_csv(output_path, index=False)
 
 print(f"CSV file '{output_path}' has been created successfully.")
-
-
-
-
-
-
