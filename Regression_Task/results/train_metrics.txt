@@ -1,3 +1,4 @@
-Training MSE: 0.2789
-Training RMSE: 0.5281
-Training R²: 0.9721
+Training MSE: 0.2627
+Training RMSE: 0.5125
+Training R²: 0.9737
+Total Epochs: 13459
