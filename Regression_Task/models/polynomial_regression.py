@@ -4,50 +4,51 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 df=pd.read_csv("/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/data/training_data.csv")
-# Shuffle the data and reset the index
+
+#using shuffling to make sure the samples are well distributes
 df_shuffled = df.sample(frac=1).reset_index(drop=True)
 
 train_data = df_shuffled
 
-# Extract features and target
+#dividing into train and test 
 X_train = train_data.drop(columns='FUEL CONSUMPTION').values
 y_train = train_data['FUEL CONSUMPTION'].values
 
 
-# Step 1: Add Bias Term
+#adding a bias term 
 def add_bias_term(X):
     return np.column_stack([np.ones(X.shape[0]), X])
 
-# Step 2: Polynomial Feature Transformation
+#curve firring 
 def polynomial_features(X, degree):
     poly_X = X.copy()
     for deg in range(2, degree + 1):
         poly_X = np.column_stack([poly_X, X ** deg])
     return poly_X
 
-# Step 3: Initialize Weights
+# initialising all weights to 1
 def initialize_weights(n_features):
     return np.full(n_features, 1)
 
-# Step 4: Hypothesis Function (for predictions)
+# function for predictions
 def hypothesis(X, weights):
     return np.dot(X, weights)
 
-# Step 5: Mean Squared Error (MSE)
+# calculating MSE
 def mse_loss(y_true, y_pred):
     return np.mean((y_true - y_pred) ** 2)
 
-# Step 6: Root Mean Squared Error (RMSE)
+# calculating RMSE
 def rmse_loss(y_true, y_pred):
     return np.sqrt(mse_loss(y_true, y_pred))
 
-# Step 7: R-squared (R²)
+# calculating R-squared (R²)
 def r_squared(y_true, y_pred):
     ss_total = np.sum((y_true - np.mean(y_true)) ** 2)
     ss_residual = np.sum((y_true - y_pred) ** 2)
     return 1 - (ss_residual / ss_total)
 
-# Step 8: Gradient Descent
+# gradient descent 
 def gradient_descent(X, y, weights, learning_rate, n_iterations):
     m = X.shape[0]
     for i in range(n_iterations):
@@ -60,8 +61,8 @@ def gradient_descent(X, y, weights, learning_rate, n_iterations):
             print(f"Iteration {i}: MSE = {loss:.4f}")
     return weights
 
-# Step 9: Train the Model
-degree = 3  # Degree of the polynomial
+# training the model
+degree = 3  
 X_train_poly = polynomial_features(X_train, degree)
 X_train_bias = add_bias_term(X_train_poly)
 
@@ -69,25 +70,21 @@ n_features = X_train_bias.shape[1]
 weights = initialize_weights(n_features)
 
 learning_rate = 0.39
-n_iterations = 50000
+n_iterations = 50000 
 
-# Train the model using gradient descent
+
 trained_weights = gradient_descent(X_train_bias, y_train, weights, learning_rate, n_iterations)
 
-# Step 10: Predictions on Training Data
 y_train_pred = hypothesis(X_train_bias, trained_weights)
 
 
 #y_test_pred = hypothesis(X_test_bias, trained_weights)
 
-# Step 12: Calculate Metrics for Training Data
-
-# Step 12: Calculate Metrics for Training Data
 train_mse = mse_loss(y_train, y_train_pred)
 train_rmse = rmse_loss(y_train, y_train_pred)
 train_r2 = r_squared(y_train, y_train_pred)
 
-# Output training metrics to file
+# output training metrics to file
 with open('/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/results/train_metrics.txt', 'w') as f:
     f.write(f"Regression Metrics\n")
     f.write(f"Mean Squared Error (MSE): {train_mse:.4f}\n")
@@ -96,33 +93,32 @@ with open('/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/result
 
 
 def create_and_overwrite_predictions_csv(actual, predicted, filename):
-    # Create a new DataFrame with 'Actual' and 'Predicted' columns
+    # create a new DataFrame with 'Actual' and 'Predicted' columns
     new_df = pd.DataFrame({
         'Actual': actual,
         'Predicted': predicted
     })
     
-    # Overwrite the existing CSV file with the new DataFrame
+    # overwrite the existing CSV file with the new DataFrame
     new_df.to_csv(filename, index=False)
     print(f"New predictions saved and file overwritten: {filename}")
 
 
 
-# Call the function to overwrite the CSV file
+# call the function to overwrite the CSV file
 create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/results/train_predictions.csv")
 
 import pickle
 
-# Create a dictionary to store the trained model (weights, degree of polynomial, etc.)
+#create information dictionary for pickled module 
 model_info = {
     'weights': trained_weights,
-    'degree': degree  # Save the degree of the polynomial transformation
+    'degree': degree  
 }
 
-# Path to save the model
 model_path = '/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/models/regression_model_final.pkl'
 
-# Save the model to a pickle file
+# save the model to a pickle file
 with open(model_path, 'wb') as file:
     pickle.dump(model_info, file)
 

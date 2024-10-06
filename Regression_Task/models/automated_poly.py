@@ -114,6 +114,4 @@ def create_and_overwrite_predictions_csv(actual, predicted, filename):
     print(f"New predictions saved and file overwritten: {filename}")
 
 
-
-
 create_and_overwrite_predictions_csv(y_train, y_train_pred, "/Users/jaeeponde/IML_A1/IML_A1/Regression_Task/results/train_predictions.csv")

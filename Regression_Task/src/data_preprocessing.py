@@ -100,4 +100,4 @@ output_path = "/Users/jaeeponde/Jaee_Ponde_A1/new_data_train.csv"  # Replace wit
 # Output the result to the specified CSV file
 df_normalized.to_csv(output_path, index=False)
 
-print(f"CSV file '{output_path}' has been created successfully.")
+
