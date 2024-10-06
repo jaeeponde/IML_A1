@@ -8,7 +8,7 @@ if 'Year' in df.columns:
     df = df.drop(columns=['Year'])
 
 # One-hot encode the 'FUEL' column if it exists
-if 'FUEL' in df.columns:
+
     one_hot_encoded_df = pd.get_dummies(df['FUEL'], prefix='FUEL')
     df = pd.concat([df, one_hot_encoded_df], axis=1)
     df = df.drop(columns=[col for col in ['FUEL', 'FUEL_D', 'FUEL_E', 'FUEL_N'] if col in df.columns])
@@ -18,6 +18,11 @@ if 'TRANSMISSION' in df.columns:
     one_hot_encoded_df = pd.get_dummies(df['TRANSMISSION'], prefix='TRANSMISSION')
     df = pd.concat([df, one_hot_encoded_df], axis=1)
     df = df.drop(columns=[col for col in ['TRANSMISSION', 'TRANSMISSION_M6', 'TRANSMISSION_AS4', 'TRANSMISSION_A3', 'TRANSMISSION_AS5'] if col in df.columns])
+
+required_columns = ['FUEL_X', 'FUEL_Z', 'TRANSMISSION_A4','TRANSMISSION_A5','TRANSMISSION_M5']
+for col in required_columns:
+    if col not in df.columns:
+        df[col] = 0
 
 # Drop the 'MODEL' column (if it exists)
 if 'MODEL' in df.columns:
@@ -60,13 +65,22 @@ for col in ['FUEL_X', 'FUEL_Z', 'TRANSMISSION_A4', 'TRANSMISSION_A5', 'TRANSMISS
     if col in df.columns:
         df[col] = df[col].astype(int)
 
-# Normalize the dataframe (excluding 'FUEL CONSUMPTION' if it exists)
-df_normalized = (df - df.min()) / (df.max() - df.min())
-if 'FUEL CONSUMPTION' in df.columns:
-    df_normalized = df.drop(columns=['FUEL CONSUMPTION'])
+
+df_normalized=df.drop(columns=['FUEL CONSUMPTION'])
+
+df_normalized = (df_normalized - df_normalized.min()) / (df_normalized.max() - df_normalized.min())
+
+df_normalized['FUEL CONSUMPTION'] = df['FUEL CONSUMPTION']
+
+df_normalized = df_normalized.fillna(0)
+
+
+
+
+
 
 # Specify the file path where you want to save the CSV
-output_path = "/Users/jaeeponde/Jaee_Ponde_A1/synthetic_data_new.csv"  # Replace with your desired path
+output_path = "/Users/jaeeponde/Jaee_Ponde_A1/new.csv"  # Replace with your desired path
 
 # Output the result to the specified CSV file
 df_normalized.to_csv(output_path, index=False)
