@@ -68,19 +68,34 @@ for col in ['FUEL_X', 'FUEL_Z', 'TRANSMISSION_A4', 'TRANSMISSION_A5', 'TRANSMISS
 
 df_normalized=df.drop(columns=['FUEL CONSUMPTION'])
 
-df_normalized = (df_normalized - df_normalized.min()) / (df_normalized.max() - df_normalized.min())
+custom_min_max = {
+    'FUEL_X': {'min': 0, 'max': 1},  # Example custom values for column1
+    'FUEL_X': {'min': 0, 'max': 1},  # Example custom values for column2
+    'TRANSMISSION_A4': {'min': 0, 'max': 1}, 
+    'TRANSMISSION_A5': {'min': 0, 'max': 1},
+    'TRANSMISSION_M5': {'min': 0, 'max': 1},
+    'MAKE': {'min': 2.75, 'max': 6.25},
+    'VEHICLE CLASS': {'min': 2.99, 'max': 4.83},
+    'ENGINE SIZE': {'min': 1.0, 'max': 8.0},
+    'CYLINDERS': {'min': 3, 'max': 12},
+    'COEMISSIONS': {'min': 104, 'max': 495} # Example custom values for column3
+    # Add more columns and their custom min/max values
+}
+
+
+
+# Normalize each column individually using its custom min and max values
+for col in df_normalized.columns:
+    if col in custom_min_max:
+        col_min = custom_min_max[col]['min']
+        col_max = custom_min_max[col]['max']
+        df_normalized[col] = (df_normalized[col] - col_min) / (col_max - col_min)
+
 
 df_normalized['FUEL CONSUMPTION'] = df['FUEL CONSUMPTION']
 
-df_normalized = df_normalized.fillna(0)
-
-
-
-
-
-
 # Specify the file path where you want to save the CSV
-output_path = "/Users/jaeeponde/Jaee_Ponde_A1/new.csv"  # Replace with your desired path
+output_path = "/Users/jaeeponde/Jaee_Ponde_A1/new_data_train.csv"  # Replace with your desired path
 
 # Output the result to the specified CSV file
 df_normalized.to_csv(output_path, index=False)

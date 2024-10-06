@@ -11,7 +11,7 @@ def apply_polynomial_features(X, degree):
     return X_poly
 
 # Load your dataset (assuming it's a pandas DataFrame)
-df_normalized = pd.read_csv('/Users/jaeeponde/Jaee_Ponde_A1/new.csv')  # Update with your actual file path
+df_normalized = pd.read_csv('/Users/jaeeponde/Jaee_Ponde_A1/new_data_train.csv')  # Update with your actual file path
 
 # Separate the features and target (assuming 'FUEL CONSUMPTION' is the target variable)
 X = df_normalized.drop(columns=['FUEL CONSUMPTION']).values  # Convert features to NumPy array
