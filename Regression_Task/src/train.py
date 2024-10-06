@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
-df=pd.read_csv("/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/data/training_data.csv")
+df=pd.read_csv("training_data.csv")
 
 #using shuffling to make sure the samples are well distributes
 df_shuffled = df.sample(frac=1).reset_index(drop=True)
@@ -56,13 +56,13 @@ def gradient_descent(X, y, weights, learning_rate, n_iterations):
         gradients = (1/m) * np.dot(X.T, (y_pred - y))
         weights = weights - learning_rate * gradients
         
-        if i % 10000 == 0:
+        if i % 1000 == 0:
             loss = mse_loss(y, y_pred)
             print(f"Iteration {i}: MSE = {loss:.4f}")
     return weights
 
 # training the model
-degree = 3  
+degree = 3
 X_train_poly = polynomial_features(X_train, degree)
 X_train_bias = add_bias_term(X_train_poly)
 
@@ -70,7 +70,7 @@ n_features = X_train_bias.shape[1]
 weights = initialize_weights(n_features)
 
 learning_rate = 0.39
-n_iterations = 50000 
+n_iterations = 20000
 
 
 trained_weights = gradient_descent(X_train_bias, y_train, weights, learning_rate, n_iterations)
@@ -116,7 +116,7 @@ model_info = {
     'degree': degree  
 }
 
-model_path = '/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/models/regression_model_final.pkl'
+model_path = '/Users/jaeeponde/Jaee_Ponde_A1/Regression Task/Regression_Task/models/regression_model2.pkl'
 
 # save the model to a pickle file
 with open(model_path, 'wb') as file:
